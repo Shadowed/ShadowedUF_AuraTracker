@@ -2,20 +2,18 @@ local ShadowUF = ShadowUF
 local AuraTracker = {}
 ShadowUF:RegisterModule(AuraTracker, "AuraTracker", "AuraTracker")
 
-function AuraTracker:OnInitialize()
-	local frame = CreateFrame("Frame")
-	frame:RegisterEvent("ADDON_LOADED")
-	frame:SetScript("OnEvent", function(self, event, addon)
-		if( IsAddOnLoaded("ShadowedUF_AuraTracker") ) then
-			self:UnregisterEvent("ADDON_LOADED")
-			for _, unit in pairs(ShadowUF.units) do
-				if ( ShadowUF.db.profile.units[unit].AuraTracker == nil ) then
-					ShadowUF.db.profile.units[unit].AuraTracker = { enabled = true }
-				end
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("ADDON_LOADED")
+frame:SetScript("OnEvent", function(self, event, addon)
+	if( IsAddOnLoaded("ShadowedUF_AuraTracker") ) then
+		self:UnregisterEvent("ADDON_LOADED")
+		for _, unit in pairs(ShadowUF.units) do
+			if ( ShadowUF.db.profile.units[unit].AuraTracker == nil ) then
+				ShadowUF.db.profile.units[unit].AuraTracker = { enabled = true }
 			end
 		end
-	end)
-end
+	end
+end)
 
 function AuraTracker:UnitEnabled(frame, unit)
 
