@@ -1,25 +1,8 @@
 local ShadowUF = ShadowUF
 local AuraTracker = {}
-ShadowUF:RegisterModule(AuraTracker, "AuraTracker", "AuraTracker")
+ShadowUF:RegisterModule(AuraTracker, "auraTracker", "AuraTracker")
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("ADDON_LOADED")
-frame:SetScript("OnEvent", function(self, event, addon)
-	if( IsAddOnLoaded("ShadowedUF_AuraTracker") ) then
-		self:UnregisterEvent("ADDON_LOADED")
-		for _, unit in pairs(ShadowUF.units) do
-			if ( ShadowUF.db.profile.units[unit].AuraTracker == nil ) then
-				ShadowUF.db.profile.units[unit].AuraTracker = { enabled = true }
-			end
-		end
-	end
-end)
-
-function AuraTracker:UnitEnabled(frame, unit)
-
-	if ( not frame.visibility.AuraTracker ) then
-		return
-	end
+function AuraTracker:OnEnable(frame)
 	
 	if ( not frame.CCFrame ) then
 		frame.CCFrame = CreateFrame("Frame", nil, frame) 
@@ -33,29 +16,28 @@ function AuraTracker:UnitEnabled(frame, unit)
 	
 end
 
-function AuraTracker:UnitDisabled(frame, unit)
+function AuraTracker:OnDisable(frame, unit)
 	frame:UnregisterAll(self)
 end
 
-function AuraTracker:LayoutApplied(self)
+function AuraTracker:OnLayoutApplied(self)
 	AuraTracker:UpdateFrame(self)
 	AuraTracker:Scan(self, self.unit)
 end
 
-function AuraTracker:ConfigurationLoaded(options)
+function AuraTracker:OnDefaultsSet()
+	for _, unit in pairs(ShadowUF.units) do
+		ShadowUF.defaults.profile.units[unit].auraTracker = { enabled = true }
+	end
+end
 
-	local enableAuras = {
+function AuraTracker:OnConfigurationLoad()
+	ShadowUF.Config.unitTable.args.general.args.portrait.args.auraTracker = {
 		order = 4,
 		name = "Enable aura tracker",
-		arg = "AuraTracker.enabled",
+		arg = "auraTracker.enabled",
 		type = "toggle",
 	}
-
-	options.args.units.args.global.args.general.args.portrait.args.enableAuras = enableAuras
-	for _, unit in pairs(ShadowUF.units) do
-		options.args.units.args[unit].args.general.args.portrait.args.enableAuras = enableAuras
-	end
-	
 end
 
 local function UpdateText(self, elapsed)
@@ -75,7 +57,7 @@ function AuraTracker:UpdateFrame(frame)
 		return 
 	end
 	
-	if ( not ShadowUF.db.profile.units[frame.unitType].AuraTracker.enabled or not frame.visibility.AuraTracker or not frame.visibility.portrait ) then
+	if ( not ShadowUF.db.profile.units[frame.unitType].auraTracker.enabled or not frame.visibility.auraTracker or not frame.visibility.portrait ) then
 		frame.CCFrame:Hide()
 	else
 		frame.CCFrame:Show()
