@@ -1,4 +1,4 @@
-## Interface: 30100
+## Interface: 30300
 ## Title: ShadowedUF_AuraTracker
 ## Notes: Adds auras to Shadowed Unit Frames portraits.
 ## Author: Proditor

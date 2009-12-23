@@ -25,11 +25,13 @@ function AuraTracker:OnLayoutApplied(self)
 	AuraTracker:Scan(self, self.unit)
 end
 
-function AuraTracker:OnDefaultsSet()
-	for _, unit in pairs(ShadowUF.units) do
-		ShadowUF.defaults.profile.units[unit].auraTracker = { enabled = true }
-	end
+function AuraTracker:OnInitialize()
+       for _, unit in pairs(ShadowUF.units) do
+               ShadowUF.db.profile.units[unit].auraTracker = ShadowUF.db.profile.units[unit].auraTracker or { enabled = true }
+       end
 end
+
+AuraTracker.OnProfileChange = AuraTracker.OnInitialize
 
 function AuraTracker:OnConfigurationLoad()
 	ShadowUF.Config.unitTable.args.general.args.portrait.args.auraTracker = {
