@@ -26,7 +26,7 @@ function AuraTracker:OnLayoutApplied(self)
 end
 
 function AuraTracker:OnInitialize()
-       for _, unit in pairs(ShadowUF.units) do
+       for _, unit in pairs(ShadowUF.unitList) do
                ShadowUF.db.profile.units[unit].auraTracker = ShadowUF.db.profile.units[unit].auraTracker or { enabled = true }
        end
 end
