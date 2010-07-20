@@ -1,19 +1,16 @@
-local ShadowUF = ShadowUF
 local AuraTracker = {}
 ShadowUF:RegisterModule(AuraTracker, "auraTracker", "AuraTracker")
 
 function AuraTracker:OnEnable(frame)
-	
 	if ( not frame.CCFrame ) then
 		frame.CCFrame = CreateFrame("Frame", nil, frame) 
 		frame.CCFrame.icon = frame.CCFrame:CreateTexture(nil, "ARTWORK")
 		frame.CCFrame.text = frame.CCFrame:CreateFontString(nil, "OVERLAY")
 	end
-	
+
 	frame:RegisterUnitEvent("UNIT_AURA", self, "Scan")
 	frame:RegisterUnitEvent("PLAYER_CHANGED_TARGET", self, "Scan")
 	frame:RegisterUpdateFunc(self, "Scan")
-	
 end
 
 function AuraTracker:OnDisable(frame, unit)
@@ -26,9 +23,9 @@ function AuraTracker:OnLayoutApplied(self)
 end
 
 function AuraTracker:OnInitialize()
-       for _, unit in pairs(ShadowUF.unitList) do
-               ShadowUF.db.profile.units[unit].auraTracker = ShadowUF.db.profile.units[unit].auraTracker or { enabled = true }
-       end
+	for _, unit in pairs(ShadowUF.unitList) do
+		ShadowUF.db.proShadowUF.db.profile.units[unit].auraTracker = ShadowUF.db.profile.units[unit].auraTracker or { enabled = true }
+	end
 end
 
 AuraTracker.OnProfileChange = AuraTracker.OnInitialize
@@ -43,28 +40,28 @@ function AuraTracker:OnConfigurationLoad()
 end
 
 local function UpdateText(self, elapsed)
-	if (self.auraActive) then
+	if( self.auraActive ) then
 		self.timeLeft = self.timeLeft - elapsed
 		if (self.timeLeft <= 0) then
 			self.icon:SetTexture("")
 			self.text:SetText("")
-		end	
-		self.text:SetFormattedText("%.1f", self.timeLeft)
+		else
+			self.text:SetFormattedText("%.1f", self.timeLeft)
+		end
 	end
 end
 
 function AuraTracker:UpdateFrame(frame)
-
 	if ( not frame.CCFrame or not frame.portrait) then 
 		return 
 	end
-	
+
 	if ( not ShadowUF.db.profile.units[frame.unitType].auraTracker.enabled or not frame.visibility.auraTracker or not frame.visibility.portrait ) then
 		frame.CCFrame:Hide()
 	else
 		frame.CCFrame:Show()
 	end
-	
+
 	frame.CCFrame:SetAllPoints(frame.portrait)
 	frame.CCFrame:SetScript("OnUpdate", UpdateText)
 	frame.CCFrame:SetFrameStrata("HIGH")
@@ -74,50 +71,47 @@ function AuraTracker:UpdateFrame(frame)
 	frame.CCFrame.text:SetFont(ShadowUF.Layout.mediaPath.font, ShadowUF.db.profile.font.size+5, "OUTLINE")
 	frame.CCFrame.text:SetTextColor(0,1,0)
 	frame.CCFrame.text:SetAllPoints(frame.CCFrame)
-	
 end
 
 function AuraTracker:Scan(frame)
-
 	if ( not frame.CCFrame or not frame.portrait ) then return end
 	local auraList = AuraTracker:GetAuras()
 	local priority = 0
 	local auraName, auraIcon, auraExpTime
 	local index = 1
-	
-	
+
 	--Buffs
 	while ( true ) do
 		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable = UnitAura(frame.unit, index, "HELPFUL")
 		if ( not name ) then break end
-		
+
 		if ( auraList[name] and auraList[name] >= priority ) then
 			priority = auraList[name]
 			auraName = name
 			auraIcon = icon
 			auraExpTime = expirationTime
 		end
-		
+
 		index = index+1
 	end
-	
+
 	index = 1
-	
+
 	--Debuffs 
 	while ( true ) do
 		local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable = UnitAura(frame.unit, index, "HARMFUL")
 		if ( not name ) then break end
-		
+
 		if ( auraList[name] and auraList[name] >= priority ) then
 			priority = auraList[name]
 			auraName = name
 			auraIcon = icon
 			auraExpTime = expirationTime
 		end
-		
+
 		index = index+1	
 	end
-	
+
 	if ( auraName ) then -- If an aura is found, display it and set the time left!
 		--frame.portrait:SetAlpha(0)
 		frame.CCFrame.icon:SetTexture(auraIcon)
@@ -129,7 +123,6 @@ function AuraTracker:Scan(frame)
 		frame.CCFrame.text:SetText("")
 		frame.CCFrame.auraActive = false
 	end
-	
 end
 
 function AuraTracker:GetAuras()
@@ -154,13 +147,13 @@ function AuraTracker:GetAuras()
 		[GetSpellInfo(61305)] 	= 3,	--Polymorph black cat
 		[GetSpellInfo(61025)] 	= 3,	--Polymorph serpent
 		[GetSpellInfo(51514)]	= 3,	--Hex
-		
+
 		--roots
 		[GetSpellInfo(53308)] 	= 3, 	--Entangling Roots
 		[GetSpellInfo(42917)]	= 3,	--Frost Nova
 		[GetSpellInfo(16979)] 	= 3, 	--Feral Charge
 		[GetSpellInfo(13809)] 	= 1, 	--Frost Trap
-		
+
 		--Stuns and incapacitates
 		[GetSpellInfo(8983)] 	= 3, 	--Bash
 		[GetSpellInfo(1833)] 	= 3,	--Cheap Shot
@@ -176,19 +169,19 @@ function AuraTracker:GetAuras()
 		[GetSpellInfo(46968)] 	= 3, 	--Shockwave
 		[GetSpellInfo(49203)] 	= 3,	--Hungering Cold
 		[GetSpellInfo(47481)]	= 3,	--Gnaw (dk pet stun)
-		
+
 		--Silences
 		[GetSpellInfo(18469)] 	= 1,	--Improved Counterspell
 		[GetSpellInfo(15487)] 	= 1, 	--Silence
 		[GetSpellInfo(34490)] 	= 1, 	--Silencing Shot	
 		[GetSpellInfo(18425)]	= 1,	--Improved Kick
 		[GetSpellInfo(49916)]	= 1,	--Strangulate
-		
+
 		--Disarms
 		[GetSpellInfo(676)] 	= 1, 	--Disarm
 		[GetSpellInfo(51722)] 	= 1,	--Dismantle
 		[GetSpellInfo(53359)] 	= 1,	--Chimera Shot - Scorpid	
-				
+
 		--Buffs
 		[GetSpellInfo(1022)] 	= 1,	--Blessing of Protection
 		[GetSpellInfo(10278)] 	= 1,	--Hand of Protection
@@ -200,11 +193,10 @@ function AuraTracker:GetAuras()
 		[GetSpellInfo(18708)]  	= 1,	--Fel Domination
 		[GetSpellInfo(54428)]	= 1,	--Divine Plea
 		[GetSpellInfo(31821)]	= 1,	--Aura mastery
-		
+
 		--immunities
 		[GetSpellInfo(34692)] 	= 2, 	--The Beast Within
 		[GetSpellInfo(45438)] 	= 2, 	--Ice Block
 		[GetSpellInfo(642)] 	= 2,	--Divine Shield
-		
 	}
 end
